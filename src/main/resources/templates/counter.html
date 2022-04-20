@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Counter</title>
+</head>
+<body>
+
+
+<div th:fragment="Counter (initialCount)" th:inline="javascript">
+-<div v-scope="Counter()">
+    Initial: [[${initialCount}]]
+    Count: {{ count }}
+    <button @click="increment">Increase</button>
+</div>
+
+-<script>
+    //let test = [[${initialCount}]]
+    function Counter(props) {
+        return {
+            count: props.count,
+            increment(){
+                this.count++;
+            }
+        }
+    }
+</script>
+<style>
+    button{
+        background-color: cornflowerblue;
+        border-radius: 10px;
+    }
+</style>
+</div>
+
+</body>
+</html>
