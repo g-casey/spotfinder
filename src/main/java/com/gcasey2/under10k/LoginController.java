@@ -1,7 +1,9 @@
 package com.gcasey2.under10k;
 
 import com.gcasey2.under10k.models.AuthResponseModel;
+import com.gcasey2.under10k.models.AuthType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,15 +21,22 @@ public class LoginController {
     private LoginService loginService;
 
     @Autowired
-    public LoginController(LoginService loginService){
+    public LoginController(LoginService loginService) {
         this.loginService = loginService;
     }
-
 
     @GetMapping
     public RedirectView authorizeSpotify() {
         final String url = loginService.getAuthRedirectUrl();
         return new RedirectView(url);
+    }
+
+    @GetMapping("/client")
+    public RedirectView getSpotifyClientAuthCode(RedirectAttributes redirectAttributes){
+        AuthResponseModel response = loginService.sendSpotifyClientAuthRequest();
+        redirectAttributes.addFlashAttribute("authentication", response);
+        response.setAuthType(AuthType.CLIENT);
+        return new RedirectView("/discover");
     }
 
     @GetMapping("/authenticated")
@@ -41,7 +50,9 @@ public class LoginController {
             return new RedirectView("auth-error");
         }
 
-        AuthResponseModel response = loginService.sendSpotifyAuthRequest(code.get());
+        AuthResponseModel response = loginService.sendSpotifyOAuthRequest(code.get());
+
+        response.setAuthType(AuthType.OAUTH);
         redirectAttributes.addFlashAttribute("authentication", response);
         return new RedirectView("/discover");
     }

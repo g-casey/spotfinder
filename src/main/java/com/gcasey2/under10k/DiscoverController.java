@@ -1,35 +1,79 @@
 package com.gcasey2.under10k;
 
-import com.gcasey2.under10k.models.AuthResponseModel;
+import com.gcasey2.under10k.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import javax.sound.midi.Track;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
+@SessionAttributes({"index","trackList", "topArtists"})
 @RequestMapping("/discover")
 public class DiscoverController {
 
 
-    private DiscoverService discoverService;
+    private final DiscoverService discoverService;
+    private final SpotifyRequestService requestService;
 
     @Autowired
-    public DiscoverController(DiscoverService discoverService) {
+    public DiscoverController(DiscoverService discoverService, SpotifyRequestService requestService) {
         this.discoverService = discoverService;
+        this.requestService = requestService;
+    }
+
+    private void initialFetch(AuthResponseModel authentication, Model model){
+        List<TrackModel> trackData;
+
+        if(authentication.getAuthType() == AuthType.OAUTH){
+            TopArtistsModel topArtistsModel = requestService.getUsersTopArtists(authentication);
+            trackData = discoverService.fetchRecommendationsOAUTH(authentication, topArtistsModel, 0);
+            model.addAttribute("userName", requestService.getUserProfile(authentication).getDisplay_name());
+            model.addAttribute("topArtists", topArtistsModel);
+        }else{
+            trackData = discoverService.fetchRecommendationsClient(authentication, "anime");
+        }
+
+        model.addAttribute("index", trackData.size() - 1);
+        model.addAttribute("trackList", trackData);
+    }
+
+    private void returningFetch(AuthResponseModel authentication, Model model){
+        List<TrackModel> trackData;
+
+        int index = (int) model.getAttribute("index");
+        List<TrackModel> oldTrackData = (List<TrackModel>) model.getAttribute("trackList");
+
+        if(authentication.getAuthType() == AuthType.OAUTH){
+            TopArtistsModel topArtistsModel = (TopArtistsModel) model.getAttribute("topArtists");
+            trackData = discoverService.fetchRecommendationsOAUTH(authentication, topArtistsModel, index);
+        }else{
+            trackData = discoverService.fetchRecommendationsClient(authentication, "anime", oldTrackData, index);
+        }
+        index += trackData.size();
+
+        model.addAttribute("index", index);
+        model.addAttribute("trackList", trackData);
     }
 
     @GetMapping
-    public String getDiscover(@ModelAttribute("authentication") AuthResponseModel authentication, Model model) {
+    public String getDiscover(
+            @ModelAttribute("authentication") AuthResponseModel authentication,
+            Model model) {
 
         if (authentication.getAccess_token() == null) {
-            return "error";
+            //redirect to get client auth token
+            return "redirect:/login/client";
         }
 
-        String data = discoverService.getSongRecommendations(authentication).toString();
-        model.addAttribute("data", data);
-
-        return "discover";
+        if (!model.containsAttribute("trackList") || ((List<TrackModel>) model.getAttribute("trackList")).size() == 0) {
+            initialFetch(authentication, model);
+            return "discover";
+        }
+        returningFetch(authentication, model);
+        return "carousel";
     }
 }

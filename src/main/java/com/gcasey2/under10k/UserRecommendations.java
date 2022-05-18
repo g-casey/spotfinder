@@ -1,15 +1,11 @@
 package com.gcasey2.under10k;
 
-import com.gcasey2.under10k.models.ArtistModel;
-import com.gcasey2.under10k.models.TopArtistsModel;
-import com.gcasey2.under10k.models.TopTracksModel;
-import com.gcasey2.under10k.models.TrackModel;
-import org.springframework.stereotype.Component;
+import com.gcasey2.under10k.models.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class UserRecommendations {
 
     public static ArrayList<String> getTopArtistIds(TopArtistsModel topArtistsModel) {

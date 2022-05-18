@@ -1,11 +1,14 @@
 package com.gcasey2.under10k.models;
 
+import org.springframework.stereotype.Component;
+
 public class AuthResponseModel {
     private String access_token;
     private String token_type;
     private int expires_in;
     private String refresh_token;
     private String scope;
+    private AuthType authType;
 
     public AuthResponseModel(){}
 
@@ -53,6 +56,14 @@ public class AuthResponseModel {
         this.scope = scope;
     }
 
+    public AuthType getAuthType() {
+        return authType;
+    }
+
+    public void setAuthType(AuthType authType) {
+        this.authType = authType;
+    }
+
     @Override
     public String toString() {
         return "AuthResponseModel{" +
@@ -61,6 +72,7 @@ public class AuthResponseModel {
                 ", expires_in=" + expires_in +
                 ", refresh_token='" + refresh_token + '\'' +
                 ", scope='" + scope + '\'' +
+                ", authType=" + authType +
                 '}';
     }
 }

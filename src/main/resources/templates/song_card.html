@@ -1,0 +1,54 @@
+{% macro input(track) %}
+
+<div class="h-full w-full border m-auto bg-white rounded-xl shadow-sm py-52 transition-all swiper-slide text-slate-100"
+  x-data="
+  {
+    playing: false,
+    index: {{ track.getListIndex() }} ,
+    toggleAudio() {
+        this.playing ? $refs.preview.pause() : $refs.preview.play();
+        this.playing = !this.playing;
+    } 
+  }
+  " x-init="$nextTick(() => {
+    //(O(n^2) fix later)
+    if(!$data.swiper.slides.includes($el)){
+      $data.swiper.appendSlide($el.outerHTML);
+    }
+
+    if($data.swiper.slides.length > 40){
+        $data.swiper.removeSlide(0);
+      }
+
+    })" id="card">
+  <div
+    class="bg-[url({{ track.getImageUrl() }})] blur-xl brightness-[70%] h-screen w-screen bg-fixed bg-center bg-no-repeat bg-cover fixed top-0 left-0 -z-50">
+  </div>
+  <div class="h-full w-full flex flex-col justify-center items-center gap-3">
+    <div class="w-7/12 flex justify-center items-center group" @click="toggleAudio()">
+      <img src=" {{ track.getImageUrl() }} " alt="album cover"
+        class="rounded-sm shadow-md group-hover:brightness-[20%] group-hover:blur-[1px] group-hover:contrast-75 group-hover:transition-all group-hover:duration-500" />
+      <span class="absolute opacity-0 group-hover:opacity-100 material-icons text-white text-5xl"
+        x-show="!playing">play_arrow</span>
+      <span class="absolute opacity-0 group-hover:opacity-100 material-icons text-white text-5xl"
+        x-show="playing">pause</span>
+    </div>
+    <div class="w-7/12 flex items-center justify-around">
+      <button class="px-1 text-white absolute top-0 left-4 bottom-0 h-[39px] m-auto" @click="$data.swiper.slidePrev()">
+        <span class="material-icons text-3xl">navigate_before</span>
+      </button>
+      <h2 class="font-medium text-2xl text-center overflow-hidden text-ellipsis max-h-24">
+        {{ track.getName() }}
+      </h2>
+      <button class="px-1 text-white absolute top-0 right-4 bottom-0 h-[39px] m-auto" @click="$data.swiper.slideNext()">
+        <span class="material-icons text-3xl">navigate_next</span>
+      </button>
+    </div>
+    <p class="font-light">{{ track.getArtist() }}</p>
+  </div>
+  <audio {% if track.getListIndex() == 0 %} autoplay {% endif %}  loop x-ref="preview" x-init="$el.volume = 0.05" @play="$data.playing = true">
+    <source src="{{ track.getPreview_url() }}" type="audio/mpeg" />
+  </audio>
+</div>
+
+{% endmacro %}

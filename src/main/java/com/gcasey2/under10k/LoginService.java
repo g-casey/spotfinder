@@ -20,6 +20,7 @@ public class LoginService {
     private String CLIENT_SECRET;
     private String REDIRECT_URL;
     private String scopes;
+    private String authState;
 
     @Autowired
     public LoginService(@Value("${client.id}") String CLIENT_ID,
@@ -32,7 +33,6 @@ public class LoginService {
         this.scopes = scopes;
     }
 
-    private String authState;
 
     private String generateRandomString(int length) {
         final String charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -43,7 +43,7 @@ public class LoginService {
                 .collect(Collectors.joining());
     }
 
-    public AuthResponseModel sendSpotifyAuthRequest(String code) {
+    public AuthResponseModel sendSpotifyOAuthRequest(String code) {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("grant_type", "authorization_code");
         requestBody.add("code", code);
@@ -52,6 +52,23 @@ public class LoginService {
         requestBody.add("client_secret", CLIENT_SECRET);
 
         WebClient webClient = WebClient.create();
+
+        return webClient.post()
+                .uri("https://accounts.spotify.com/api/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData(requestBody))
+                .retrieve()
+                .bodyToMono(AuthResponseModel.class)
+                .block();
+    }
+
+    public AuthResponseModel sendSpotifyClientAuthRequest(){
+        WebClient webClient = WebClient.create();
+
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("grant_type", "client_credentials");
+        requestBody.add("client_id", CLIENT_ID);
+        requestBody.add("client_secret", CLIENT_SECRET);
 
         return webClient.post()
                 .uri("https://accounts.spotify.com/api/token")
