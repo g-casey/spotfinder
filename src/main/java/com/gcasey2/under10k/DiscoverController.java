@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.sound.midi.Track;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -25,7 +26,7 @@ public class DiscoverController {
         this.requestService = requestService;
     }
 
-    private void initialFetch(AuthResponseModel authentication, Model model){
+    private void initialFetch(AuthResponseModel authentication, Model model, String genre){
         List<TrackModel> trackData;
 
         if(authentication.getAuthType() == AuthType.OAUTH){
@@ -34,14 +35,15 @@ public class DiscoverController {
             model.addAttribute("userName", requestService.getUserProfile(authentication).getDisplay_name());
             model.addAttribute("topArtists", topArtistsModel);
         }else{
-            trackData = discoverService.fetchRecommendationsClient(authentication, "anime");
+            trackData = discoverService.fetchRecommendationsClient(authentication, genre);
         }
 
+        model.addAttribute("genres", requestService.getAllGenres(authentication).getGenres());
         model.addAttribute("index", trackData.size() - 1);
         model.addAttribute("trackList", trackData);
     }
 
-    private void returningFetch(AuthResponseModel authentication, Model model){
+    private void returningFetch(AuthResponseModel authentication, Model model, String genre){
         List<TrackModel> trackData;
 
         int index = (int) model.getAttribute("index");
@@ -51,7 +53,7 @@ public class DiscoverController {
             TopArtistsModel topArtistsModel = (TopArtistsModel) model.getAttribute("topArtists");
             trackData = discoverService.fetchRecommendationsOAUTH(authentication, topArtistsModel, index);
         }else{
-            trackData = discoverService.fetchRecommendationsClient(authentication, "anime", oldTrackData, index);
+            trackData = discoverService.fetchRecommendationsClient(authentication, genre, oldTrackData, index);
         }
         index += trackData.size();
 
@@ -62,7 +64,14 @@ public class DiscoverController {
     @GetMapping
     public String getDiscover(
             @ModelAttribute("authentication") AuthResponseModel authentication,
-            Model model) {
+            Model model, @RequestParam Optional<String> genre) {
+
+
+        String selectedGenre = "pop";
+
+        if(genre.isPresent()){
+            selectedGenre = genre.get();
+        }
 
         if (authentication.getAccess_token() == null) {
             //redirect to get client auth token
@@ -70,10 +79,10 @@ public class DiscoverController {
         }
 
         if (!model.containsAttribute("trackList") || ((List<TrackModel>) model.getAttribute("trackList")).size() == 0) {
-            initialFetch(authentication, model);
+            initialFetch(authentication, model, selectedGenre);
             return "discover";
         }
-        returningFetch(authentication, model);
+        returningFetch(authentication, model, selectedGenre);
         return "carousel";
     }
 }
