@@ -1,0 +1,45 @@
+{% extends "home" %}
+
+{% block title %} Discover {% endblock title %}
+
+
+{% block content %}
+
+
+<div class="swiper carousel h-3/6 w-6/12 max-h-[416px] max-w-md min-w-[340px] relative" id="carousel">
+<div class="swiper-wrapper h-full w-full" id="swipeWrapper" x-data="
+{
+    swiper: null, 
+    fetching: false, 
+    init(){
+        this.swiper = new Swiper('.carousel', {
+            effect: 'cards', 
+            grabCursor: true
+        });
+
+        this.swiper.on('transitionEnd', function() {
+            let index = this.realIndex;
+            let length = this.slides.length;
+            let previous = this.previousIndex;
+
+            this.slides[previous].querySelector('audio').pause();
+            this.slides[index].querySelector('audio').play();
+
+            if(length - index < 8 && !this.fetching){
+                this.fetching = true
+                let ajax = htmx.ajax('GET', '/discover', { target: '#swipeWrapper', swap: 'beforeend' });
+                if(typeof ajax !== 'undefined'){
+                    ajax.then(() => this.fetching = false)
+                }
+            }
+        });
+    }
+}
+">
+{% include "carousel" %}
+</div>
+</div>
+
+{% endblock content %}
+
+
