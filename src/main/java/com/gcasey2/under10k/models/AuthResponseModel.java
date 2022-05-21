@@ -1,6 +1,6 @@
 package com.gcasey2.under10k.models;
 
-import org.springframework.stereotype.Component;
+import com.gcasey2.under10k.AuthType;
 
 public class AuthResponseModel {
     private String access_token;

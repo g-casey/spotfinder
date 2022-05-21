@@ -59,7 +59,7 @@ public class DiscoverService {
                     .map(TrackModel::getId)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            if(tracks.size() > 0){
+            if(tracks.size() >= 3){
                 return tracks.subList(0, limit);
             }
 
@@ -106,35 +106,32 @@ public class DiscoverService {
     }
 
 
-    public List<TrackModel> fetchRecommendations(AuthResponseModel authentication, List<TrackModel> trackData, int index){
+    public List<TrackModel> fetchRecommendations(AuthResponseModel authentication, List<TrackModel> trackData){
         trackData.forEach(track -> track.setImageUrl(
                 requestService.getTrack(authentication, track.getId()).
                         getAlbum().getImageUrl()));
 
-        for(int i = index; i < index + trackData.size(); i++){
-            trackData.get(i - index).setListIndex(i);
-        }
         return trackData;
     }
 
-    public List<TrackModel> fetchRecommendationsOAUTH(AuthResponseModel authentication, TopArtistsModel topArtistsModel, int index){
+    public List<TrackModel> fetchRecommendationsOAUTH(AuthResponseModel authentication, TopArtistsModel topArtistsModel){
         List<TrackModel> trackData = getSongRecommendations(authentication, topArtistsModel);
-        return fetchRecommendations(authentication, trackData, index);
+        return fetchRecommendations(authentication, trackData);
     }
 
     public List<TrackModel> fetchRecommendationsClient(AuthResponseModel authentication, String genre){
         List<TrackModel> trackData = getSongRecommendationsFromGenre(authentication, genre);
-        return fetchRecommendations(authentication, trackData, 0);
+        return fetchRecommendations(authentication, trackData);
     }
 
-    public List<TrackModel> fetchRecommendationsClient(AuthResponseModel authentication, String genre, List<TrackModel> oldTrackData, int index){
+    public List<TrackModel> fetchRecommendationsClient(AuthResponseModel authentication, String genre, List<TrackModel> oldTrackData){
         ArtistModel artist = oldTrackData.get(0).getArtists().get(0);
         artist.setGenres(List.of(genre));
 
         List<TrackModel> trackData = getRecommendationsFromArtist(artist, authentication, false).getTracks().stream()
                 .filter(track -> track.getPreview_url() != null)
                 .collect(Collectors.toList());
-        return fetchRecommendations(authentication, trackData, index);
+        return fetchRecommendations(authentication, trackData);
     }
 
 
