@@ -5,26 +5,32 @@
 
 {% block content %}
 <div class="flex gap-6 bg-white rounded-xl p-4 text-center items-center shadow-sm" x-data="{
-     update(genre){
+     update(){
+         let genre = $refs.genreSelect.value;
+         let popularity = $refs.popularitySelect.value;
          let swiper = $data.swiper;
+
          swiper.slideTo(0, 0, false);
-         htmx.ajax('GET', '/discover?genre=' + genre + '&ref=true', { target: '#swipeWrapper', swap: 'innerHTML'});
+         htmx.ajax('GET', '/discover?genre=' + genre + '&popularity=' + popularity + '&ref=true', { target: '#swipeWrapper', swap: 'innerHTML'});
          swiper.update();
      }
      }">
     <label for="genreSelect" class="text-slate-700">Genre: </label>
     <select name="genres" id="genreSelect" class="bg-slate-200 rounded-md p-1 text-blue-500 shadow-md"
+            x-ref="genreSelect"
             x-init="$nextTick(() => $el.value = '{{ selectedGenre }}')"
-            @change="update($el.value)">
-        <option value="all">all</option>
+            @change="update()">
         {% for genre in genres %}
         <option value="{{ genre }}"> {{ genre }} </option>
         {% endfor %}
     </select>
 
 
-    <label for="popularity" class="text-slate-700">Popularity: </label>
-    <select name="popularity" id="popularity" class="bg-slate-200 rounded-md p-1 text-blue-500 shadow-md">
+    <label for="popularitySelect" class="text-slate-700">Popularity: </label>
+    <select name="popularity" id="popularitySelect" class="bg-slate-200 rounded-md p-1 text-blue-500 shadow-md"
+            x-ref="popularitySelect"
+            x-init="$nextTick(() => $el.value = '{{ selectedPopularity }}')"
+            @change="update()">
         <option value="all">all</option>
         <option value="high">high</option>
         <option value="medium">medium</option>
@@ -53,7 +59,9 @@
                 this.fetching = true
 
                 let genre = document.getElementById('genreSelect').value;
-                let ajax = htmx.ajax('GET', '/discover?genre=' + genre + '&ret=true', { target: '#swipeWrapper', swap: 'beforeend' });
+                let popularity = document.getElementById('popularitySelect').value;
+
+                let ajax = htmx.ajax('GET', '/discover?genre=' + genre + '&popularity=' + popularity  + '&ret=true', { target: '#swipeWrapper', swap: 'beforeend' });
                 if(typeof ajax !== 'undefined'){
                     ajax.then(() => this.fetching = false)
                 }
