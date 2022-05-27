@@ -68,7 +68,7 @@ public class ForgotPasswordController {
 
     @PostMapping("/reset")
     public String processResetPassword(@RequestParam String token, @RequestParam String password, Model model) {
-        User user = userService.getUserByResetToken(token);
+        User user = userService.getUserByResetToken(token.strip());
 
         if(user != null){
             userService.updatePassword(user, password);;
