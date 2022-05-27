@@ -1,0 +1,42 @@
+<div class="flex-cols sm:flex gap-6 bg-white rounded-xl py-4 px-10 sm:px-6 text-center items-center shadow-sm" x-data="{
+     update(){
+         let genre = $refs.genreSelect.value;
+         let popularity = $refs.popularitySelect.value;
+         let swiper = $data.swiper;
+
+         swiper.slideTo(0, 0, false);
+         let ajax = htmx.ajax('GET', '/discover?genre=' + genre + '&popularity=' + popularity + '&ref=true', { target: '#swipeWrapper', swap: 'innerHTML'});
+
+         if(typeof ajax !== 'undefined'){
+                    ajax.then(() => {
+                        swiper.update();
+                    });
+         }
+     }
+     }">
+
+    <div>
+    <label for="genreSelect" class="text-slate-700 {% if userName != null %} hidden {% endif %}">Genre: </label>
+    <select name="genres" id="genreSelect" class="bg-slate-200 rounded-md p-1 text-blue-500 shadow-md focus:outline-none focus:ring-1 focus:ring-blue-600 {% if userName != null %} hidden {% endif %}"
+            x-ref="genreSelect"
+            x-init="$nextTick(() => $el.value = '{{ selectedGenre }}')"
+            @change="update()">
+        {% for genre in genres %}
+        <option value="{{ genre }}"> {{ genre }} </option>
+        {% endfor %}
+    </select>
+    </div>
+
+    <div class="mt-2 sm:mt-0">
+    <label for="popularitySelect" class="text-slate-700">Popularity: </label>
+    <select name="popularity" id="popularitySelect" class="bg-slate-200 rounded-md p-1 text-blue-500 shadow-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+            x-ref="popularitySelect"
+            x-init="$nextTick(() => $el.value = '{{ selectedPopularity }}')"
+            @change="update()">
+        <option value="all">all</option>
+        <option value="high">high</option>
+        <option value="medium">medium</option>
+        <option value="low">low</option>
+    </select>
+    </div>
+</div>

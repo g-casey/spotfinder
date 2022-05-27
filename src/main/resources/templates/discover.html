@@ -1,50 +1,21 @@
 {% extends "home" %}
 
-{% block title %} Discover {% endblock title %}
+{% block title %}Discover{% endblock title %}
 
 
 {% block content %}
-<div class="flex gap-6 bg-white rounded-xl p-4 text-center items-center shadow-sm" x-data="{
-     update(){
-         let genre = $refs.genreSelect.value;
-         let popularity = $refs.popularitySelect.value;
-         let swiper = $data.swiper;
-
-         swiper.slideTo(0, 0, false);
-         htmx.ajax('GET', '/discover?genre=' + genre + '&popularity=' + popularity + '&ref=true', { target: '#swipeWrapper', swap: 'innerHTML'});
-         swiper.update();
-     }
-     }">
-    <label for="genreSelect" class="text-slate-700">Genre: </label>
-    <select name="genres" id="genreSelect" class="bg-slate-200 rounded-md p-1 text-blue-500 shadow-md"
-            x-ref="genreSelect"
-            x-init="$nextTick(() => $el.value = '{{ selectedGenre }}')"
-            @change="update()">
-        {% for genre in genres %}
-        <option value="{{ genre }}"> {{ genre }} </option>
-        {% endfor %}
-    </select>
-
-
-    <label for="popularitySelect" class="text-slate-700">Popularity: </label>
-    <select name="popularity" id="popularitySelect" class="bg-slate-200 rounded-md p-1 text-blue-500 shadow-md"
-            x-ref="popularitySelect"
-            x-init="$nextTick(() => $el.value = '{{ selectedPopularity }}')"
-            @change="update()">
-        <option value="all">all</option>
-        <option value="high">high</option>
-        <option value="medium">medium</option>
-        <option value="low">low</option>
-    </select>
-</div>
-<div class="swiper carousel h-3/6 w-6/12 max-h-[416px] max-w-md min-w-[340px] relative" id="carousel">
+{% if not likes %}
+{% include "selector_panel" %}
+{% endif %}
+<div class="swiper carousel h-7/12 sm:4/6 w-6/12 max-h-[416px] max-w-md min-w-[340px] relative" id="carousel">
     <div class="swiper-wrapper h-full w-full" id="swipeWrapper" x-data="
 {
     fetching: false,
     init(){
         $data.swiper = new Swiper('.carousel', {
             effect: 'cards',
-            grabCursor: true
+            grabCursor: true,
+            simulateTouch: true
         });
 
         $data.swiper.on('transitionEnd', function() {
@@ -55,6 +26,34 @@
             this.slides[previous].querySelector('audio').pause();
             this.slides[index].querySelector('audio').play();
 
+            $data.currentSong = this.slides[index].querySelector('#trackId').innerHTML;
+            $data.currentUrl =  this.slides[index].querySelector('#trackUrl').innerHTML;
+
+            let likeButton = document.getElementById('likeButton');
+
+
+            {% if likes %}
+            if(index > $data.likedSongs.length - 1){
+                $data.likedSongs.push(true);
+            }
+            {% else %}
+
+            if(index > $data.likedSongs.length - 1){
+                $data.likedSongs.push(false);
+            }
+
+            {% endif %}
+
+            if($data.likedSongs[index]){
+                likeButton.classList.add('text-red-400');
+                console.log('like initially added');
+            }else{
+                likeButton.classList.remove('text-red-400')
+                console.log('like initially removed');
+            }
+
+            {% if not likes %}
+
             if(length - index < 8 && !this.fetching){
                 this.fetching = true
 
@@ -63,9 +62,15 @@
 
                 let ajax = htmx.ajax('GET', '/discover?genre=' + genre + '&popularity=' + popularity  + '&ret=true', { target: '#swipeWrapper', swap: 'beforeend' });
                 if(typeof ajax !== 'undefined'){
-                    ajax.then(() => this.fetching = false)
+                    ajax.then(() => {
+                        this.fetching = false;
+                        this.update();
+                    });
                 }
             }
+
+            {% endif %}
+
         });
     }
 }
@@ -73,6 +78,8 @@
         {% include "carousel" %}
     </div>
 </div>
+
+{% include "options_panel" %}
 
 {% endblock content %}
 

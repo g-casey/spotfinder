@@ -1,0 +1,30 @@
+{% import "icon-button" %}
+<div class="flex gap-5 bg-white rounded-full p-3 text-center items-center shadow-sm">
+    <span @click="{% if loggedIn %}
+     fetch('/likes/add', {method: 'POST', headers: {'X-CSRF-TOKEN' : '{{ token.getToken() }}' } ,
+     body: $data.currentSong });
+     {% else %}
+     alert('You must be logged in to like a song')
+    {% endif %}
+">
+    <span class="material-icons rounded-full p-3 select-none cursor-pointer bg-blue-500 text-slate-100 hover:bg-blue-700 transition-colors duration-150" title="Like Song" x-data="{ onClick(){
+     $data.likedSongs[$data.swiper.realIndex] = !$data.likedSongs[$data.swiper.realIndex];
+    if($data.likedSongs[$data.swiper.realIndex]){
+                $el.classList.add('text-red-400');
+            }else{
+                $el.classList.remove('text-red-400')
+
+                {% if likes %}
+                $data.swiper.removeSlide($data.swiper.realIndex);
+                {% endif %}
+            }
+    }}"
+    @click="onClick()" id="likeButton">
+    favorite</span>
+    </span >
+    <span title="Add to Library" @click="alert('You must be logged in with a Spotify account to save songs to your library')"> {{ iconButton("library_add", false, false) }}</span>
+    <span @click="window.open($data.currentUrl)" title="Open in Spotify">
+    {{ iconButton("open_in_new",false, false) }}
+    </span>
+    <span title="Block Song" @click="$data.swiper.removeSlide($data.swiper.realIndex)"> {{ iconButton("block",false, false) }}</span>
+</div>

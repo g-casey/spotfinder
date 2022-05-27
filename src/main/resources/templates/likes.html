@@ -1,0 +1,12 @@
+{% extends "home" %}
+
+{% block title %}Liked Songs{% endblock title %}
+
+{% block content %}
+
+<ul>
+    {% for song in likedSongs %}
+    <li>{{ song.getName() }}</li>
+    {% endfor %}
+</ul>
+{% endblock content %}

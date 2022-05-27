@@ -1,15 +1,23 @@
 <nav class="flex justify-between items-center h-12 border px-2 py-8 sticky top-0
      bg-white">
-    <h1 class="font-medium text-2xl">spotfinder</h1>
+    <a href="/" ><h1 class="font-medium text-2xl">spotfinder</h1></a>
     <ul>
-        {% if userName %}
-        <li>
-        <h2 class="font-medium text-md px-4">{{ userName }}</h2>
+        {% if loggedIn %}
+        <li x-data="{ showing: false }" @mouseleave="showing = false" @mouseover="showing = true">
+        <h2 class="font-medium text-md px-4 select-none cursor-pointer"> {{ user.getName() }}</h2>
+            <div class="absolute right-0 top-8 py-2 mt-2 bg-white divide-y divide-gray-600 rounded-md shadow-xl w-45" x-show="showing">
+                <a href="/likes" class="block mt-4 text-center px-4 py-2 text-sm text-gray-300 text-gray-700 hover:bg-blue-500 hover:text-white">
+                    Likes
+                </a>
+                <a href="/logout" class="block text-center px-4 py-2 text-sm text-gray-300 text-gray-700 hover:bg-blue-500 hover:text-white">
+                    Logout
+                </a>
+            </div>
         </li>
-        {% else %}
+        {% elseif not login %}
         <li><a href="{{ href('/login') }}" class="bg-blue-500 hover:bg-blue-700 text-white
                 font-bold py-2 px-4 rounded transition-colors duration-150">Login</a></li>
-
+        {% else %}
         {% endif %}
     </ul>
 </nav>

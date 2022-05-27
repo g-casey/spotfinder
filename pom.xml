@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ccom.gcasey2</groupId>
-    <artifactId>under10k</artifactId>
+    <artifactId>spotfinder</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>under10k</name>
-    <description>under10k</description>
+    <name>spotfinder</name>
+    <description>Simple website to get recommendations for spotify music</description>
     <properties>
         <java.version>11</java.version>
     </properties>
@@ -44,6 +44,23 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
     </dependencies>
 

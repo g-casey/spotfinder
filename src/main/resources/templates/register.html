@@ -1,0 +1,39 @@
+{% extends "home" %}
+
+
+{% block title %}Register{% endblock title %}
+
+{% block content %}
+
+<div class="px-8 sm:px-24 py-6 mt-4 text-left bg-white shadow-lg rounded-xl"
+    {% if error %}
+     x-init="$nextTick(() => window.alert('User already exists'))"
+     {% endif %}>
+
+    <h3 class="text-2xl font-bold text-center">Register for an account</h3>
+    <form action="/register" method="post">
+        <div class="mt-8">
+            <div>
+                <label class="block" for="email">Email<label>
+                    <input required minlength="2" maxlength="40" type="text" id="email" name="email" placeholder="Email"
+                           class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600">
+            </div>
+            <div class="mt-6">
+                <label class="block" for="name">Name<label>
+                    <input required minlength="2" maxlength="20" type="text" id="name" name="name" placeholder="Name"
+                           class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600">
+            </div>
+            <div class="mt-6">
+                <label class="block" for="password">Password<label>
+                    <input required minlength="6" maxlength="20" type="password" id="password" name="password" placeholder="Password"
+                           class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600">
+            </div>
+            <div class="flex justify-center">
+                <button class="px-6 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-700 text-bold">Register</button>
+            </div>
+            <input type="hidden" name="{{ token.getParameterName() }}" value="{{ token.getToken() }}"/>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

@@ -27,12 +27,11 @@
       defer
     ></script>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/foobar404/wave.js/dist/bundle.js"></script>
 
-
-    <canvas class="fixed top-0 left-0 h-screen w-screen pointer-events-none z-0" x-ref="canvas">
-    </canvas>
-    <main class="h-full w-full pb-48 flex items-center flex-col justify-center gap-12" id="main" x-data="{ swiper: null }" >
+    <main class="h-full w-full sm:pb-12 flex items-center flex-col justify-center gap-4 sm:gap-10" id="main" x-data="
+    { swiper: null, currentSong: document.getElementById('trackId').innerHTML,
+     currentUrl: document.getElementById('trackUrl').innerHTML,
+     likedSongs: [false], currentLiked: false }" >
     {% block content %} {% endblock content %}
     </main>
      </body>
