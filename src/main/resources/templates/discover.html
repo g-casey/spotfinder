@@ -12,6 +12,12 @@
 {
     fetching: false,
     init(){
+
+        {% if noSongsError %}
+        alert('Couldn't find any songs, please try another genre');
+        {% endif %}
+
+
         $data.swiper = new Swiper('.carousel', {
             effect: 'cards',
             grabCursor: true,

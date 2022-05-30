@@ -62,9 +62,11 @@ public class DiscoverController {
             model.addAttribute("topArtists", topArtistsModel);
         }else{
             List<TrackModel> tracks = new ArrayList<>();
-            while(tracks.size() < 4 || trackData.size() < 4){
+            int tryCount = 0;
+            while((tracks.size() < 4 || trackData.size() < 4) && tryCount < 5){
                  tracks = discoverService.getSongRecommendationsFromGenre(authentication, genre, PopularityLevels.ALL);
                  trackData = discoverService.fetchRecommendationsClient(authentication, genre, tracks, popularity);
+                 tryCount ++;
             }
         }
 
@@ -74,6 +76,11 @@ public class DiscoverController {
         model.addAttribute("selectedPopularity", popularity.toString().toLowerCase());
         model.addAttribute("trackList", trackData);
         model.addAttribute("viewedTracks", new HashSet<TrackModel>(trackData));
+
+        if(trackData.size() == 0){
+            model.addAttribute("noSongsError", true);
+            System.out.println("true");
+        }
 
     }
 
@@ -87,11 +94,13 @@ public class DiscoverController {
             trackData = discoverService.fetchRecommendationsOAUTH(authentication, topArtistsModel, popularity);
         }else{
             List<TrackModel> newTrackData = new ArrayList<>();
-            while(newTrackData.size() < 4){
+            int tryCount = 0;
+            while(newTrackData.size() < 4 && tryCount < 5){
                 if(new Random().nextInt(1, 10) > 5){
                     oldTrackData = discoverService.getSongRecommendationsFromGenre(authentication, genre, PopularityLevels.ALL);
                 }
                 newTrackData = discoverService.fetchRecommendationsClient(authentication, genre, oldTrackData, popularity);
+                tryCount ++;
             }
             trackData = newTrackData;
         }

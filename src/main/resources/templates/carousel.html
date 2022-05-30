@@ -1,4 +1,5 @@
 {% import "song_card" %}
+<span class="hidden" x-init="{% if noSongsError %} alert('Could not find any songs, please pick another genre') {% endif %}"></span>
 {% for track in trackList %}
 {{ songCard(track) }}
 {% endfor %}
