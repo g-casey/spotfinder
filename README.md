@@ -7,7 +7,7 @@ Site link: https://serene-refuge-81367.herokuapp.com/
 Preview: 
 ![image](https://user-images.githubusercontent.com/46300206/171094226-853a7796-34b3-4f89-a152-632983a035f0.png)
 
-Spotify sign in is currently only working for selected memebers as spotify must approve the application. 
+Spotify sign in is currently only working for selected members as spotify must approve the application. 
 
 Backend is built with Spring MVC and frontend with tailwind css, alpine.js, and htmx. 
 
